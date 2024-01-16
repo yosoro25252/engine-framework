@@ -3,6 +3,7 @@ package com.yosoro25252.engine.framework.utils;
 import com.yosoro25252.engine.framework.enums.ColorEnum;
 import com.yosoro25252.engine.framework.pojo.GraphCheckInfo;
 import com.yosoro25252.engine.framework.processors.DAGNodeProcessor;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +18,7 @@ public class DAGUtils {
                 return processorCheckResult;
             }
         }
-        return new GraphCheckInfo(true, null, null);
+        return new GraphCheckInfo(true, null, null, null);
     }
 
     private static GraphCheckInfo doCheckCycle(DAGNodeProcessor processor, Map<DAGNodeProcessor, Integer> visitedStatusMap) {
@@ -26,7 +27,7 @@ public class DAGUtils {
             int visitedStatus = visitedStatusMap.getOrDefault(downstreamProcessor, ColorEnum.WHITE.getCode());
             if (visitedStatus == ColorEnum.GRAY.getCode()) {
                 // 已成环
-                return new GraphCheckInfo(false, processor, null);
+                return new GraphCheckInfo(false, processor, null, null);
             }
             GraphCheckInfo downstreamCheckResult = doCheckCycle(downstreamProcessor, visitedStatusMap);
             if (! downstreamCheckResult.isLegal()) {
@@ -35,7 +36,11 @@ public class DAGUtils {
             }
         }
         visitedStatusMap.put(processor, ColorEnum.BLACK.getCode());
-        return new GraphCheckInfo(true, null, null);
+        return new GraphCheckInfo(true, null, null, null);
+    }
+
+    public static void optimizeGraph(List<DAGNodeProcessor> processorList) {
+
     }
 
     public static void setUpstreamProcessorInfo(List<DAGNodeProcessor> processorList) {
@@ -65,15 +70,37 @@ public class DAGUtils {
         return orderedProcessorList;
     }
 
-    public static List<DAGNodeProcessor> findFirstProcessor(List<DAGNodeProcessor> processorList) {
-        Map<DAGNodeProcessor, Integer> inDegreeMap = new HashMap<>();
+    public static GraphCheckInfo checkParamReachableAndResolveProcessorRelation(List<DAGNodeProcessor> processorList, List<String> graphInputParamList, List<String> graphOutputParamList) {
+        Set<String> graphInputParamSet = new HashSet<>(graphInputParamList);
+        Map<String, List<DAGNodeProcessor>> outputParamProcessorMap = new HashMap<>();
         for (DAGNodeProcessor processor : processorList) {
-            for (DAGNodeProcessor downstreamProcessor : processor.getDownstreamNodeList()) {
-                inDegreeMap.put(downstreamProcessor, inDegreeMap.getOrDefault(downstreamProcessor, 0) + 1);
+            for (String param : processor.getOutputParamList()) {
+                List<DAGNodeProcessor> paramProcessorList = outputParamProcessorMap.getOrDefault(param, new ArrayList<>());
+                paramProcessorList.add(processor);
+                outputParamProcessorMap.put(param, paramProcessorList);
             }
-            inDegreeMap.putIfAbsent(processor, 0);
         }
-        return processorList.stream().filter(processor -> inDegreeMap.get(processor) == 0).collect(Collectors.toList());
+        for (DAGNodeProcessor processor : processorList) {
+            for (String param : processor.getInputParamList()) {
+                if (!graphInputParamSet.contains(param)) {
+                    List<DAGNodeProcessor> paramProcessorList = outputParamProcessorMap.get(param);
+                    if (CollectionUtils.isEmpty(paramProcessorList)) {
+                        // 入参无法获取
+                        return new GraphCheckInfo(false, processor, param, null);
+                    }
+                    for (DAGNodeProcessor paramProcessor : paramProcessorList) {
+                        paramProcessor.getDownstreamNodeList().add(processor);
+                    }
+                }
+            }
+        }
+        for (String param : graphOutputParamList) {
+            if (! graphInputParamSet.contains(param) && CollectionUtils.isEmpty(outputParamProcessorMap.get(param))) {
+                // 出参无法获取
+                return new GraphCheckInfo(false, null, param, null);
+            }
+        }
+        return new GraphCheckInfo(true, null, null, null);
     }
 
 }

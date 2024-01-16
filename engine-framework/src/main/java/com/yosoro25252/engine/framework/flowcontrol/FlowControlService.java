@@ -15,9 +15,9 @@ public class FlowControlService<S, T> {
 
     private ContextBuilder<S> contextBuilder;
 
-    private ResultBuilder<T> resultBuilder;
+    private ResultBuilder<S, T> resultBuilder;
 
-    public FlowControlService(List<IProcessor> processorList, String serviceName, ContextBuilder<S> contextBuilder, ResultBuilder<T> resultBuilder) {
+    public FlowControlService(List<IProcessor> processorList, String serviceName, ContextBuilder<S> contextBuilder, ResultBuilder<S, T> resultBuilder) {
         this.processorList = processorList;
         this.serviceName = serviceName;
         this.contextBuilder = contextBuilder;
@@ -25,11 +25,15 @@ public class FlowControlService<S, T> {
     }
 
     public T process(S request) {
-        Context context = contextBuilder.buildContext(request);
-        for (IProcessor processor : processorList) {
-            processor.process(context);
+        Context<S> context = contextBuilder.buildContext(request);
+        try {
+            for (IProcessor processor : processorList) {
+                processor.process(context);
+            }
+            return resultBuilder.buildResult(context);
+        } catch (Exception e) {
+            return resultBuilder.buildResultWhenError(context);
         }
-        return resultBuilder.buildResult(context);
     }
 
 }

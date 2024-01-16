@@ -1,11 +1,14 @@
 package com.yosoro25252.engine.framework.processors;
 
-import com.yosoro25252.engine.framework.pojo.Context;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DAGNodeProcessor implements IProcessor {
+
+    private List<String> inputParamList = new ArrayList<>();
+
+    private List<String> outputParamList = new ArrayList<>();
 
     private List<DAGNodeProcessor> upstreamNodeList = new ArrayList<>();
 
@@ -30,4 +33,11 @@ public abstract class DAGNodeProcessor implements IProcessor {
         return threadPoolTag;
     }
 
+    public List<String> getInputParamList() {
+        return inputParamList;
+    }
+
+    public List<String> getOutputParamList() {
+        return outputParamList;
+    }
 }

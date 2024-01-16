@@ -1,5 +1,6 @@
 package com.yosoro25252.engine.framework.flowcontrol;
 
+import com.yosoro25252.engine.framework.enums.BuildGraphStyleEnum;
 import com.yosoro25252.engine.framework.exception.BuildGraphException;
 import com.yosoro25252.engine.framework.pojo.Context;
 import com.yosoro25252.engine.framework.pojo.Graph;
@@ -20,12 +21,28 @@ public class DAGControlService {
 
     private Map<String, ThreadPoolExecutor> threadPoolMap;
 
-    public Graph buildGraph(List<DAGNodeProcessor> processorList, String graphName, String buildStyle, int timeout) {
+    public Graph buildGraph(List<DAGNodeProcessor> processorList,
+                            List<String> graphInputParamList,
+                            List<String> graphOutputParamList,
+                            String graphName,
+                            String buildStyle,
+                            int timeout) {
+        // 根据出入参构建结点依赖信息
+        if (BuildGraphStyleEnum.FROM_PARAM.getName().equals(buildStyle)) {
+            GraphCheckInfo paramReachable = DAGUtils.checkParamReachableAndResolveProcessorRelation(processorList, graphInputParamList, graphOutputParamList);
+            if (! paramReachable.isLegal()) {
+                throw new BuildGraphException();
+            }
+        }
+
         // 判环
         GraphCheckInfo containCycleResult = DAGUtils.checkGraphCycle(processorList);
         if (! containCycleResult.isLegal()) {
             throw new BuildGraphException();
         }
+
+        // 优化结点关系
+        DAGUtils.optimizeGraph(processorList);
 
         // 配置结点依赖信息
         DAGUtils.setUpstreamProcessorInfo(processorList);
@@ -36,8 +53,6 @@ public class DAGControlService {
         // 建图
         return new Graph(graphName, timeout, processorList.size(), processorList, orderedProcessorList);
     }
-
-
 
     public void runGraph(Graph graph, Context context) {
         Map<DAGNodeProcessor, CompletableFuture<Void>> completableFutureMap = new HashMap<>();

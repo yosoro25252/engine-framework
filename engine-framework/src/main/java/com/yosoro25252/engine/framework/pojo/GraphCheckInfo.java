@@ -12,6 +12,8 @@ public class GraphCheckInfo {
 
     private DAGNodeProcessor errorNode;
 
+    private String errorParam;
+
     private Exception e;
 
 }
