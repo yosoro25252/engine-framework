@@ -39,14 +39,52 @@ public class DAGUtils {
         return new GraphCheckInfo(true, null, null, null);
     }
 
-    public static void optimizeGraph(List<DAGNodeProcessor> processorList) {
-
+    public static void optimizeGraph(List<DAGNodeProcessor> orderedProcessorList, List<String> graphInputParamList) {
+        Map<DAGNodeProcessor, Set<String>> processorParamMap = new HashMap<>();
+        for (int i = 1; i < orderedProcessorList.size(); i ++) {
+            DAGNodeProcessor processor = orderedProcessorList.get(i);
+            Set<String> requiredInputParamSet = new HashSet<>(processor.getInputParamList());
+            Set<String> currInputParamSet = new HashSet<>(graphInputParamList);
+            Set<String> allParamSet = new HashSet<>(graphInputParamList);
+            allParamSet.addAll(processor.getOutputParamList());
+            Set<DAGNodeProcessor> upstreamProcessorSet = new HashSet<>(processor.getUpstreamNodeList());
+            List<DAGNodeProcessor> newUpstreamProcessorList = new ArrayList<>();
+            for (int j = i - 1; j > -1; j --) {
+                // 逆序遍历，优先取靠后的结点，靠后的结点有更多的参数
+                DAGNodeProcessor upstreamProcessor = orderedProcessorList.get(j);
+                if (upstreamProcessorSet.contains(upstreamProcessor)) {
+                    boolean alreadyContainParam = true;
+                    for (String param : processorParamMap.get(upstreamProcessor)) {
+                        if (requiredInputParamSet.contains(param) && ! currInputParamSet.contains(param)) {
+                            alreadyContainParam = false;
+                            currInputParamSet.add(param);
+                        }
+                    }
+                    if (! alreadyContainParam) {
+                        newUpstreamProcessorList.add(upstreamProcessor);
+                        allParamSet.addAll(processorParamMap.get(upstreamProcessor));
+                    }
+                }
+            }
+            processor.setUpstreamNodeList(newUpstreamProcessorList);
+            processorParamMap.put(processor, allParamSet);
+        }
+        orderedProcessorList.forEach(processor -> processor.getDownstreamNodeList().clear());
+        setDownstreamProcessorInfo(orderedProcessorList);
     }
 
     public static void setUpstreamProcessorInfo(List<DAGNodeProcessor> processorList) {
         for (DAGNodeProcessor processor : processorList) {
             for (DAGNodeProcessor downstreamProcessor : processor.getDownstreamNodeList()) {
                 downstreamProcessor.getUpstreamNodeList().add(processor);
+            }
+        }
+    }
+
+    public static void setDownstreamProcessorInfo(List<DAGNodeProcessor> processorList) {
+        for (DAGNodeProcessor processor : processorList) {
+            for (DAGNodeProcessor upstreamProcessor : processor.getUpstreamNodeList()) {
+                upstreamProcessor.getDownstreamNodeList().add(processor);
             }
         }
     }

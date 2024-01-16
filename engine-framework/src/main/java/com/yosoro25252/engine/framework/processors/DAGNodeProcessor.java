@@ -21,8 +21,16 @@ public abstract class DAGNodeProcessor implements IProcessor {
         return null;
     }
 
+    public void setUpstreamNodeList(List<DAGNodeProcessor> upstreamNodeList) {
+        this.upstreamNodeList = upstreamNodeList;
+    }
+
     public List<DAGNodeProcessor> getUpstreamNodeList() {
         return upstreamNodeList;
+    }
+
+    public void setDownstreamNodeList(List<DAGNodeProcessor> downstreamNodeList) {
+        this.downstreamNodeList = downstreamNodeList;
     }
 
     public List<DAGNodeProcessor> getDownstreamNodeList() {

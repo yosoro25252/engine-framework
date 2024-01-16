@@ -41,14 +41,14 @@ public class DAGControlService {
             throw new BuildGraphException();
         }
 
-        // 优化结点关系
-        DAGUtils.optimizeGraph(processorList);
-
         // 配置结点依赖信息
         DAGUtils.setUpstreamProcessorInfo(processorList);
 
         // 序列构建
         List<DAGNodeProcessor> orderedProcessorList = DAGUtils.buildOrderedProcessorSequence(processorList);
+
+        // 优化结点关系
+        DAGUtils.optimizeGraph(orderedProcessorList, graphInputParamList);
 
         // 建图
         return new Graph(graphName, timeout, processorList.size(), processorList, orderedProcessorList);
