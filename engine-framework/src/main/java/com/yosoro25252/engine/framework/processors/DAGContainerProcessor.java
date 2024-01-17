@@ -4,13 +4,11 @@ import com.yosoro25252.engine.framework.enums.BuildGraphStyleEnum;
 import com.yosoro25252.engine.framework.flowcontrol.DAGControlService;
 import com.yosoro25252.engine.framework.pojo.Context;
 import com.yosoro25252.engine.framework.pojo.Graph;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class DAGContainerProcessor implements IProcessor {
 
     private List<String> inputParamList = new ArrayList<>();
@@ -23,7 +21,7 @@ public class DAGContainerProcessor implements IProcessor {
 
     private String graphName;
 
-    private String buildGraphStyle = BuildGraphStyleEnum.FROM_NEIGHBOURS.getName();
+    private String buildGraphStyle;
 
     private int timeout;
 
@@ -34,18 +32,21 @@ public class DAGContainerProcessor implements IProcessor {
                                  List<DAGNodeProcessor> processorList,
                                  DAGControlService controlService,
                                  String graphName,
+                                 String buildGraphStyle,
                                  int timeout) {
         this.inputParamList = inputParamList;
         this.outputParamList = outputParamList;
         this.processorList = processorList;
         this.controlService = controlService;
         this.graphName = graphName;
+        this.buildGraphStyle = buildGraphStyle;
         this.timeout = timeout;
     }
 
-    @PostConstruct
     private void init() {
+        System.out.println("start init");
         this.graph = controlService.buildGraph(processorList, inputParamList, outputParamList, graphName, buildGraphStyle, timeout);
+        System.out.println("end init");
     }
 
     @Override

@@ -5,8 +5,10 @@ import com.yosoro25252.engine.framework.exception.BuildGraphException;
 import com.yosoro25252.engine.framework.pojo.Context;
 import com.yosoro25252.engine.framework.pojo.Graph;
 import com.yosoro25252.engine.framework.pojo.GraphCheckInfo;
+import com.yosoro25252.engine.framework.pojo.GraphStructureInfo;
 import com.yosoro25252.engine.framework.processors.DAGNodeProcessor;
 import com.yosoro25252.engine.framework.utils.DAGUtils;
+import com.yosoro25252.engine.framework.utils.GsonUtils;
 
 
 import java.util.HashMap;
@@ -20,6 +22,10 @@ import java.util.concurrent.TimeoutException;
 public class DAGControlService {
 
     private Map<String, ThreadPoolExecutor> threadPoolMap;
+
+    public DAGControlService(Map<String, ThreadPoolExecutor> threadPoolMap) {
+        this.threadPoolMap = threadPoolMap;
+    }
 
     public Graph buildGraph(List<DAGNodeProcessor> processorList,
                             List<String> graphInputParamList,
@@ -47,8 +53,12 @@ public class DAGControlService {
         // 序列构建
         List<DAGNodeProcessor> orderedProcessorList = DAGUtils.buildOrderedProcessorSequence(processorList);
 
-        // 优化结点关系
+        // 优化结点关系 - 让图结构更清晰
         DAGUtils.optimizeGraph(orderedProcessorList, graphInputParamList);
+
+        // 图可视化
+        GraphStructureInfo graphStructureInfo = DAGUtils.getGraphStructureInfo(processorList);
+        System.out.println("图结构信息: " + GsonUtils.getJsonStringFromObject(graphStructureInfo));
 
         // 建图
         return new Graph(graphName, timeout, processorList.size(), processorList, orderedProcessorList);
@@ -71,9 +81,9 @@ public class DAGControlService {
         try {
             CompletableFuture.allOf(allCompletableFuture).get(graph.getTimeout(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | TimeoutException e) {
-
+            System.out.println(e);
         } catch (Exception e) {
-
+            System.out.println(e);
         }
     }
 

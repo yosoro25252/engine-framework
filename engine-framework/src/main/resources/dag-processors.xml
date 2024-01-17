@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    <bean id="simpleDAGProcessorV1" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+        <property name="inputParamList">
+            <list>
+                <value>userId</value>
+                <value>uuid</value>
+                <value>strategy</value>
+            </list>
+        </property>
+        <property name="outputParamList">
+            <list>
+                <value>score</value>
+            </list>
+        </property>
+        <property name="threadPoolTag" value="cpu"/>
+    </bean>
+
+    <bean id="simpleDAGProcessorV2" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV2">
+        <property name="inputParamList">
+            <list>
+                <value>strategy</value>
+                <value>score</value>
+            </list>
+        </property>
+        <property name="outputParamList">
+            <list>
+                <value>weightedScore</value>
+            </list>
+        </property>
+        <property name="threadPoolTag" value="cpu"/>
+    </bean>
+
+</beans>

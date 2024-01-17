@@ -16,11 +16,6 @@ public abstract class DAGNodeProcessor implements IProcessor {
 
     private String threadPoolTag;
 
-    @Override
-    public String getProcessorName() {
-        return null;
-    }
-
     public void setUpstreamNodeList(List<DAGNodeProcessor> upstreamNodeList) {
         this.upstreamNodeList = upstreamNodeList;
     }
@@ -37,12 +32,24 @@ public abstract class DAGNodeProcessor implements IProcessor {
         return downstreamNodeList;
     }
 
+    public void setThreadPoolTag(String threadPoolTag) {
+        this.threadPoolTag = threadPoolTag;
+    }
+
     public String getThreadPoolTag() {
         return threadPoolTag;
     }
 
+    public void setInputParamList(List<String> inputParamList) {
+        this.inputParamList = inputParamList;
+    }
+
     public List<String> getInputParamList() {
         return inputParamList;
+    }
+
+    public void setOutputParamList(List<String> outputParamList) {
+        this.outputParamList = outputParamList;
     }
 
     public List<String> getOutputParamList() {

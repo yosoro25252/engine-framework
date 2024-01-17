@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    <import resource="dag-processors.xml"/>
+    <import resource="services.xml"/>
+
+    <bean id="simpleGraph" class="com.yosoro25252.engine.framework.processors.DAGContainerProcessor" init-method="init">
+        <constructor-arg name="inputParamList">
+            <list>
+                <value>userId</value>
+                <value>uuid</value>
+                <value>strategy</value>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="outputParamList">
+            <list>
+                <value>weightedScore</value>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="processorList">
+            <list>
+                <ref bean="simpleDAGProcessorV1"/>
+                <ref bean="simpleDAGProcessorV2"/>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="controlService" ref="dagControlService"/>
+        <constructor-arg name="graphName" value="simpleGraph"/>
+        <constructor-arg name="buildGraphStyle" value="from_param"/>
+        <constructor-arg name="timeout" value="1000000"/>
+    </bean>
+
+
+</beans>

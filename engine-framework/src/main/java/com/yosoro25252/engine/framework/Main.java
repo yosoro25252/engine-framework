@@ -1,19 +1,29 @@
 package com.yosoro25252.engine.framework;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+import com.yosoro25252.engine.framework.pojo.Context;
+import com.yosoro25252.engine.framework.processors.DAGContainerProcessor;
+import com.yosoro25252.engine.framework.processors.DAGNodeProcessor;
+import com.yosoro25252.engine.framework.processors.IProcessor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 public class Main {
     public static void main(String[] args) {
-        // Press Alt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("beans.xml");
+        Context context = new Context();
+//        IProcessor processor = (IProcessor) applicationContext.getBean("simpleFlowProcessor");
+//        processor.doProcess(context);
+//        processor.fallback(context);
 
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
+//        DAGNodeProcessor dagNodeProcessor1 = (DAGNodeProcessor) applicationContext.getBean("simpleDAGProcessorV1");
+//        dagNodeProcessor1.doProcess(context);
+//        dagNodeProcessor1.fallback(context);
+//        DAGNodeProcessor dagNodeProcessor2 = dagNodeProcessor1.getDownstreamNodeList().get(0);
+//        dagNodeProcessor2.doProcess(context);
+//        dagNodeProcessor2.fallback(context);
 
-            // Press Shift+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            System.out.println("i = " + i);
-        }
+        DAGContainerProcessor graphContainerProcessor = (DAGContainerProcessor) applicationContext.getBean("simpleGraph");
+        graphContainerProcessor.process(context);
+        System.out.println("finish");
     }
 }

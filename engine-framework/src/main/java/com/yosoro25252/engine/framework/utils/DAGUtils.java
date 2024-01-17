@@ -2,6 +2,7 @@ package com.yosoro25252.engine.framework.utils;
 
 import com.yosoro25252.engine.framework.enums.ColorEnum;
 import com.yosoro25252.engine.framework.pojo.GraphCheckInfo;
+import com.yosoro25252.engine.framework.pojo.GraphStructureInfo;
 import com.yosoro25252.engine.framework.processors.DAGNodeProcessor;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -41,6 +42,11 @@ public class DAGUtils {
 
     public static void optimizeGraph(List<DAGNodeProcessor> orderedProcessorList, List<String> graphInputParamList) {
         Map<DAGNodeProcessor, Set<String>> processorParamMap = new HashMap<>();
+        for (DAGNodeProcessor processor : orderedProcessorList) {
+            Set<String> paramSet = new HashSet<>(processor.getInputParamList());
+            paramSet.addAll(processor.getOutputParamList());
+            processorParamMap.put(processor, paramSet);
+        }
         for (int i = 1; i < orderedProcessorList.size(); i ++) {
             DAGNodeProcessor processor = orderedProcessorList.get(i);
             Set<String> requiredInputParamSet = new HashSet<>(processor.getInputParamList());
@@ -139,6 +145,12 @@ public class DAGUtils {
             }
         }
         return new GraphCheckInfo(true, null, null, null);
+    }
+
+    public static GraphStructureInfo getGraphStructureInfo(List<DAGNodeProcessor> processorList) {
+        List<GraphStructureInfo.NodeInfo> nodeList = processorList.stream().map(processor -> new GraphStructureInfo.NodeInfo(processor.getProcessorName())).collect(Collectors.toList());
+        List<GraphStructureInfo.EdgeInfo> edgeList = processorList.stream().flatMap(processor -> processor.getDownstreamNodeList().stream().map(downstreamProcessor -> new GraphStructureInfo.EdgeInfo(processor.getProcessorName(), downstreamProcessor.getProcessorName()))).collect(Collectors.toList());
+        return new GraphStructureInfo(nodeList, edgeList);
     }
 
 }
