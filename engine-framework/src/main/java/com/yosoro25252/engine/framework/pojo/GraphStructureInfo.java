@@ -11,9 +11,15 @@ public class GraphStructureInfo {
 
     private List<EdgeInfo> edges;
 
+    private List<String> graphInputParams;
+
+    private List<String> graphOutputParams;
+
     @AllArgsConstructor
     public static class NodeInfo {
         private String name;
+        private List<String> inputParams;
+        private List<String> outputParams;
     }
 
     @AllArgsConstructor

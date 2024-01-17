@@ -57,7 +57,7 @@ public class DAGControlService {
         DAGUtils.optimizeGraph(orderedProcessorList, graphInputParamList);
 
         // 图可视化
-        GraphStructureInfo graphStructureInfo = DAGUtils.getGraphStructureInfo(processorList);
+        GraphStructureInfo graphStructureInfo = DAGUtils.getGraphStructureInfo(processorList, graphInputParamList, graphOutputParamList);
         System.out.println("图结构信息: " + GsonUtils.getJsonStringFromObject(graphStructureInfo));
 
         // 建图

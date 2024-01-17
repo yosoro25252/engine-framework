@@ -147,10 +147,10 @@ public class DAGUtils {
         return new GraphCheckInfo(true, null, null, null);
     }
 
-    public static GraphStructureInfo getGraphStructureInfo(List<DAGNodeProcessor> processorList) {
-        List<GraphStructureInfo.NodeInfo> nodeList = processorList.stream().map(processor -> new GraphStructureInfo.NodeInfo(processor.getProcessorName())).collect(Collectors.toList());
+    public static GraphStructureInfo getGraphStructureInfo(List<DAGNodeProcessor> processorList, List<String> graphInputParamList, List<String> graphOutputParamList) {
+        List<GraphStructureInfo.NodeInfo> nodeList = processorList.stream().map(processor -> new GraphStructureInfo.NodeInfo(processor.getProcessorName(), processor.getInputParamList(), processor.getOutputParamList())).collect(Collectors.toList());
         List<GraphStructureInfo.EdgeInfo> edgeList = processorList.stream().flatMap(processor -> processor.getDownstreamNodeList().stream().map(downstreamProcessor -> new GraphStructureInfo.EdgeInfo(processor.getProcessorName(), downstreamProcessor.getProcessorName()))).collect(Collectors.toList());
-        return new GraphStructureInfo(nodeList, edgeList);
+        return new GraphStructureInfo(nodeList, edgeList, graphInputParamList, graphOutputParamList);
     }
 
 }
