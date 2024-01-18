@@ -4,6 +4,9 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    <!--  存放图结点组件bean  -->
+    <import resource="services.xml"/>
+
     <bean id="simpleDAGProcessorV1" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
         <property name="inputParamList">
             <list>
@@ -18,6 +21,7 @@
             </list>
         </property>
         <property name="threadPoolTag" value="cpu"/>
+        <property name="monitorService" ref="monitorService"/>
     </bean>
 
     <bean id="simpleDAGProcessorV2" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV2">
@@ -33,6 +37,7 @@
             </list>
         </property>
         <property name="threadPoolTag" value="cpu"/>
+        <property name="monitorService" ref="monitorService"/>
     </bean>
 
 </beans>

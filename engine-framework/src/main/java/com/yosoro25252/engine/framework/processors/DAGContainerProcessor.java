@@ -1,15 +1,19 @@
 package com.yosoro25252.engine.framework.processors;
 
-import com.yosoro25252.engine.framework.enums.BuildGraphStyleEnum;
 import com.yosoro25252.engine.framework.flowcontrol.DAGControlService;
 import com.yosoro25252.engine.framework.pojo.Context;
 import com.yosoro25252.engine.framework.pojo.Graph;
+import com.yosoro25252.engine.framework.services.IMonitorService;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DAGContainerProcessor implements IProcessor {
+/**
+ * @author：yosoro25252
+ * @date：2024/1/16
+ * @desc: DAG容器组件。通过这个组件完成建图和图执行。图的具体执行逻辑由其中的DAGNodeProcessor控制
+ */
+public class DAGContainerProcessor extends BaseProcessor {
 
     private List<String> inputParamList = new ArrayList<>();
 
@@ -31,6 +35,7 @@ public class DAGContainerProcessor implements IProcessor {
                                  List<String> outputParamList,
                                  List<DAGNodeProcessor> processorList,
                                  DAGControlService controlService,
+                                 IMonitorService monitorService,
                                  String graphName,
                                  String buildGraphStyle,
                                  int timeout) {
@@ -38,15 +43,14 @@ public class DAGContainerProcessor implements IProcessor {
         this.outputParamList = outputParamList;
         this.processorList = processorList;
         this.controlService = controlService;
+        this.monitorService = monitorService;
         this.graphName = graphName;
         this.buildGraphStyle = buildGraphStyle;
         this.timeout = timeout;
     }
 
     private void init() {
-        System.out.println("start init");
         this.graph = controlService.buildGraph(processorList, inputParamList, outputParamList, graphName, buildGraphStyle, timeout);
-        System.out.println("end init");
     }
 
     @Override
@@ -55,13 +59,22 @@ public class DAGContainerProcessor implements IProcessor {
     }
 
     @Override
-    public void doProcess(Context context) {
-        this.controlService.runGraph(graph, context);
+    protected void doProcess(Context context) {
+        try {
+            this.controlService.runGraph(graph, context);
+        } catch (Exception e) {
+            fallback(context, e);
+        }
     }
 
-    @Override
-    public void fallback(Context context) {
+    /**
+     * 拓展接口 - 异常兜底方法
+     * 默认抛出异常，可根据情况需要重写
+     * @param context 流程上下文
+     * @param e 异常
+     */
+    protected void fallback(Context context, Exception e) {
+        throw new RuntimeException(e);
     }
-
 
 }

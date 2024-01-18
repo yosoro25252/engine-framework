@@ -6,6 +6,11 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ * @author：yosoro25252
+ * @date：2024/1/16
+ * @desc: 图配置信息
+ */
 @Getter
 @AllArgsConstructor
 public class Graph {

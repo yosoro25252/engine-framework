@@ -4,6 +4,7 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    <!--  存放图流程组件bean  -->
     <import resource="dag-processors.xml"/>
     <import resource="services.xml"/>
 
@@ -27,6 +28,7 @@
             </list>
         </constructor-arg>
         <constructor-arg name="controlService" ref="dagControlService"/>
+        <constructor-arg name="monitorService" ref="monitorService"/>
         <constructor-arg name="graphName" value="simpleGraph"/>
         <constructor-arg name="buildGraphStyle" value="from_param"/>
         <constructor-arg name="timeout" value="1000000"/>

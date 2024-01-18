@@ -11,6 +11,11 @@ import java.util.stream.Collectors;
 
 public class DAGUtils {
 
+    /**
+     * 检查图是否有环，调用doCheckCycle完成任务
+     * @param processorList 结点 list
+     * @return 图检查结果
+     */
     public static GraphCheckInfo checkGraphCycle(List<DAGNodeProcessor> processorList) {
         Map<DAGNodeProcessor, Integer> visitedStatusMap = new HashMap<>();
         for (DAGNodeProcessor processor : processorList) {
@@ -22,6 +27,12 @@ public class DAGUtils {
         return new GraphCheckInfo(true, null, null, null);
     }
 
+    /**
+     * 通过dfs，检查图是否有环
+     * @param processor
+     * @param visitedStatusMap
+     * @return 图检查结果
+     */
     private static GraphCheckInfo doCheckCycle(DAGNodeProcessor processor, Map<DAGNodeProcessor, Integer> visitedStatusMap) {
         visitedStatusMap.put(processor, ColorEnum.GRAY.getCode());
         for (DAGNodeProcessor downstreamProcessor : processor.getDownstreamNodeList()) {
@@ -40,6 +51,11 @@ public class DAGUtils {
         return new GraphCheckInfo(true, null, null, null);
     }
 
+    /**
+     * 图优化：将每个结点的上游结点精简
+     * @param orderedProcessorList 拓扑序的结点 list
+     * @param graphInputParamList 图入参 list
+     */
     public static void optimizeGraph(List<DAGNodeProcessor> orderedProcessorList, List<String> graphInputParamList) {
         Map<DAGNodeProcessor, Set<String>> processorParamMap = new HashMap<>();
         for (DAGNodeProcessor processor : orderedProcessorList) {
@@ -79,6 +95,10 @@ public class DAGUtils {
         setDownstreamProcessorInfo(orderedProcessorList);
     }
 
+    /**
+     * 配置上游结点信息
+     * @param processorList 结点 list
+     */
     public static void setUpstreamProcessorInfo(List<DAGNodeProcessor> processorList) {
         for (DAGNodeProcessor processor : processorList) {
             for (DAGNodeProcessor downstreamProcessor : processor.getDownstreamNodeList()) {
@@ -87,6 +107,10 @@ public class DAGUtils {
         }
     }
 
+    /**
+     * 配置下游结点信息
+     * @param processorList 结点 list
+     */
     public static void setDownstreamProcessorInfo(List<DAGNodeProcessor> processorList) {
         for (DAGNodeProcessor processor : processorList) {
             for (DAGNodeProcessor upstreamProcessor : processor.getUpstreamNodeList()) {
@@ -95,6 +119,11 @@ public class DAGUtils {
         }
     }
 
+    /**
+     * 构建图拓扑序
+     * @param processorList 结点 list
+     * @return 拓扑序结点 list
+     */
     public static List<DAGNodeProcessor> buildOrderedProcessorSequence(List<DAGNodeProcessor> processorList) {
         List<DAGNodeProcessor> orderedProcessorList = new ArrayList<>(processorList.size());
         Map<DAGNodeProcessor, Integer> inDegreeMap = new HashMap<>();
@@ -114,6 +143,13 @@ public class DAGUtils {
         return orderedProcessorList;
     }
 
+    /**
+     * 检查参数是否可达并解析结点依赖关系
+     * @param processorList 结点 list
+     * @param graphInputParamList 图入参 list
+     * @param graphOutputParamList 图出参 list
+     * @return 图检查结果
+     */
     public static GraphCheckInfo checkParamReachableAndResolveProcessorRelation(List<DAGNodeProcessor> processorList, List<String> graphInputParamList, List<String> graphOutputParamList) {
         Set<String> graphInputParamSet = new HashSet<>(graphInputParamList);
         Map<String, List<DAGNodeProcessor>> outputParamProcessorMap = new HashMap<>();
@@ -147,6 +183,13 @@ public class DAGUtils {
         return new GraphCheckInfo(true, null, null, null);
     }
 
+    /**
+     * 获取图可视化信息
+     * @param processorList 结点 list
+     * @param graphInputParamList 图入参 list
+     * @param graphOutputParamList 图出参 list
+     * @return 可视化信息
+     */
     public static GraphStructureInfo getGraphStructureInfo(List<DAGNodeProcessor> processorList, List<String> graphInputParamList, List<String> graphOutputParamList) {
         List<GraphStructureInfo.NodeInfo> nodeList = processorList.stream().map(processor -> new GraphStructureInfo.NodeInfo(processor.getProcessorName(), processor.getInputParamList(), processor.getOutputParamList())).collect(Collectors.toList());
         List<GraphStructureInfo.EdgeInfo> edgeList = processorList.stream().flatMap(processor -> processor.getDownstreamNodeList().stream().map(downstreamProcessor -> new GraphStructureInfo.EdgeInfo(processor.getProcessorName(), downstreamProcessor.getProcessorName()))).collect(Collectors.toList());

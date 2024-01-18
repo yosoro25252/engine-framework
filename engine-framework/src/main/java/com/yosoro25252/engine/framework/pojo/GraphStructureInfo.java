@@ -4,6 +4,11 @@ import lombok.AllArgsConstructor;
 
 import java.util.List;
 
+/**
+ * @author：yosoro25252
+ * @date：2024/1/16
+ * @desc: 图可视化信息
+ */
 @AllArgsConstructor
 public class GraphStructureInfo {
 

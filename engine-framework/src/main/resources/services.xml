@@ -4,6 +4,7 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    <!--  存放基础服务  -->
     <bean id="cpuThreadPool" class="java.util.concurrent.ThreadPoolExecutor">
         <constructor-arg name="corePoolSize" type="int" value="16" />
         <constructor-arg name="maximumPoolSize" type="int" value="32" />
@@ -40,5 +41,7 @@
             </map>
         </constructor-arg>
     </bean>
+    
+    <bean id="monitorService" class="com.yosoro25252.engine.framework.impl.SimpleMonitorService"/>
 
 </beans>

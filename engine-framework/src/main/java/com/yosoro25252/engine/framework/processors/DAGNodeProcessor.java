@@ -4,7 +4,13 @@ package com.yosoro25252.engine.framework.processors;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class DAGNodeProcessor implements IProcessor {
+/**
+ * @author：yosoro25252
+ * @date：2024/1/16
+ * @desc: DAG结点组件
+ * TODO: 添加日志
+ */
+public abstract class DAGNodeProcessor extends BaseProcessor {
 
     private List<String> inputParamList = new ArrayList<>();
 

@@ -1,7 +1,6 @@
 package com.yosoro25252.engine.framework.flowcontrol;
 
 import com.yosoro25252.engine.framework.enums.BuildGraphStyleEnum;
-import com.yosoro25252.engine.framework.exception.BuildGraphException;
 import com.yosoro25252.engine.framework.pojo.Context;
 import com.yosoro25252.engine.framework.pojo.Graph;
 import com.yosoro25252.engine.framework.pojo.GraphCheckInfo;
@@ -14,14 +13,18 @@ import com.yosoro25252.engine.framework.utils.GsonUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
+/**
+ * @author：yosoro25252
+ * @date：2024/1/16
+ * @desc: DAG组件调度服务
+ * TODO: 添加日志
+ */
 public class DAGControlService {
 
     private Map<String, ThreadPoolExecutor> threadPoolMap;
+
 
     public DAGControlService(Map<String, ThreadPoolExecutor> threadPoolMap) {
         this.threadPoolMap = threadPoolMap;
@@ -37,14 +40,14 @@ public class DAGControlService {
         if (BuildGraphStyleEnum.FROM_PARAM.getName().equals(buildStyle)) {
             GraphCheckInfo paramReachable = DAGUtils.checkParamReachableAndResolveProcessorRelation(processorList, graphInputParamList, graphOutputParamList);
             if (! paramReachable.isLegal()) {
-                throw new BuildGraphException();
+                throw new RuntimeException("参数" + paramReachable.getErrorParam() + "不可达");
             }
         }
 
         // 判环
         GraphCheckInfo containCycleResult = DAGUtils.checkGraphCycle(processorList);
         if (! containCycleResult.isLegal()) {
-            throw new BuildGraphException();
+            throw new RuntimeException("结点" + containCycleResult.getErrorNode().getProcessorName() + "处有环");
         }
 
         // 配置结点依赖信息
@@ -58,13 +61,13 @@ public class DAGControlService {
 
         // 图可视化
         GraphStructureInfo graphStructureInfo = DAGUtils.getGraphStructureInfo(processorList, graphInputParamList, graphOutputParamList);
-        System.out.println("图结构信息: " + GsonUtils.getJsonStringFromObject(graphStructureInfo));
+        System.out.println(graphName + "图结构信息: " + GsonUtils.getJsonStringFromObject(graphStructureInfo));
 
         // 建图
         return new Graph(graphName, timeout, processorList.size(), processorList, orderedProcessorList);
     }
 
-    public void runGraph(Graph graph, Context context) {
+    public void runGraph(Graph graph, Context context) throws ExecutionException, InterruptedException, TimeoutException {
         Map<DAGNodeProcessor, CompletableFuture<Void>> completableFutureMap = new HashMap<>();
         CompletableFuture<Void>[] allCompletableFuture = new CompletableFuture[graph.getSize()];
         for (int i = 0; i < graph.getSize(); i ++) {
@@ -78,13 +81,7 @@ public class DAGControlService {
             completableFutureMap.put(processor, processorCompletableFuture);
             allCompletableFuture[i] = processorCompletableFuture;
         }
-        try {
-            CompletableFuture.allOf(allCompletableFuture).get(graph.getTimeout(), TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | TimeoutException e) {
-            System.out.println(e);
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+        CompletableFuture.allOf(allCompletableFuture).get(graph.getTimeout(), TimeUnit.MILLISECONDS);
     }
 
 }

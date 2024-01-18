@@ -11,13 +11,8 @@ public class SimpleFlowProcessor extends FlowProcessor {
     }
 
     @Override
-    public void doProcess(Context context) {
+    protected void doProcess(Context context) {
         System.out.println("SimpleFlowProcessor.doProcess()");
-    }
-
-    @Override
-    public void fallback(Context context) {
-        System.out.println("SimpleFlowProcessor.fallback()");
     }
 
 }

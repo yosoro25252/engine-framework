@@ -10,12 +10,8 @@ public class SimpleDAGNodeProcessorV2 extends DAGNodeProcessor {
     }
 
     @Override
-    public void doProcess(Context context) {
+    protected void doProcess(Context context) {
         System.out.println("SimpleDAGNodeProcessorV2.doProcess");
     }
 
-    @Override
-    public void fallback(Context context) {
-        System.out.println("SimpleDAGNodeProcessorV2.fallback");
-    }
 }
