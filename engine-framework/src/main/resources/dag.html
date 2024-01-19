@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>DAG绘制</title>
+    <!-- 引入 echarts.js -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.2.2/echarts.min.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <h1 style="text-align: center;">DAG绘制</h1>
+    <h5 style="text-align: center;">请将 <span title="可通过DAGUtils.getGraphStructureInfo获取"><strong><u>图结构</u></strong></span> 填写到文本框中，点击“绘制”按钮开始绘图</h5>
+    <textarea id="graphInfo" style="display: block; width: 500px; height: 100px; margin-bottom: 30px; margin-left: auto; margin-right: auto;">{"nodes":[{"name":"A","inputParams":["a","b","c"],"outputParams":["d"]},{"name":"B","inputParams":["a","d"],"outputParams":["e"]},{"name":"C","inputParams":["b","c","d"],"outputParams":["f","g"]},{"name":"D","inputParams":["a","e","g"],"outputParams":["h"]},{"name":"E","inputParams":["e"],"outputParams":["i"]},{"name":"F","inputParams":["a","i","f","g"],"outputParams":["j","k"]},{"name":"G","inputParams":["i","j"],"outputParams":["l","m"]},{"name":"H","inputParams":["f","h","m"],"outputParams":["n"]}],"edges":[{"source":"A","target":"B"},{"source":"A","target":"C"},{"source":"B","target":"E"},{"source":"B","target":"D"},{"source":"C","target":"D"},{"source":"C","target":"F"},{"source":"D","target":"H"},{"source":"E","target":"F"},{"source":"F","target":"G"},{"source":"G","target":"H"}],"graphInputParams":["a","b","c"],"graphOutputParams":["m","n"]}</textarea>
+    <div id="buttons" style="display: flex; justify-content: center; align-items: center; margin-bottom: 30px;">
+        <button style="margin-right: 10px;" onclick="draw()">绘制</button>
+        <button style="margin-left: 10px; margin-right: 10px;" onclick="cleanUp()">清空</button>
+        <button style="margin-left: 10px;" onclick="copy()">复制</button>
+    </div>
+    <div id="graphVisualization" style="display: flex; justify-content: center; align-items: center; margin-bottom: 30px;">
+        <div id="graph" style="width: 60%;height:700px;"></div>
+        <div style="width: 30%;height:700px;">
+            <h5 id="nodeName">结点信息</h5>
+            <textarea id="nodeInfo" style="width: 100%; height: 650px;" disabled></textarea>
+        </div>
+        
+    </div>
+    
+    <script type="text/javascript">
+
+        function cleanUp() {
+            document.getElementById('graphInfo').value = "";
+        }
+
+        function copy() {
+            /* 获取 textarea 元素 */
+            var copyText = document.getElementById("graphInfo");
+
+            /* 选择 textarea 的文本 */
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); /* 对于移动设备 */
+
+            /* 复制文本到剪贴板 */
+            document.execCommand("copy");
+        }
+
+        function setPosition(nodes, edges, graphInputParams, graphOutputParams, width, height) {
+            let degrees = {};
+            for (var i = 0; i < nodes.length; i ++) {
+                degrees[nodes[i].name] = 0;
+            }
+            for (var i = 0; i < edges.length; i ++) {
+                degrees[edges[i].target] += 1;
+            }
+            console.log(degrees);
+
+            let startNodes = [];
+            for (var i = 0; i < nodes.length; i ++) {
+                if (degrees[nodes[i].name] == 0) {
+                    startNodes.push(nodes[i]);
+                }
+            }
+            console.log(startNodes);
+
+            let nodeMap = {};
+            for (var i = 0; i < nodes.length; i ++) {
+                nodeMap[nodes[i].name] = nodes[i];
+            }
+            console.log(nodeMap);
+
+            let visited = new Set();
+            let queue = [];
+            for (var i = 0; i < startNodes.length; i ++) {
+                queue.push(startNodes[i]);
+                visited.add(startNodes[i].name);
+            }
+            console.log(visited);
+
+            params = {}
+            for (var i = 0; i < nodes.length; i ++) {
+                params[nodes[i].name] = new Set();
+                graphInputParams.forEach(item => params[nodes[i].name].add(item));
+                nodes[i].inputParams.forEach(item => params[nodes[i].name].add(item)); 
+                nodes[i].outputParams.forEach(item => params[nodes[i].name].add(item));
+            }
+            console.log(params);
+
+            var paramMap = {}
+            var upstreamContribution = {};
+            for (var i = 0; i < nodes.length; i ++) {
+                var node = nodes[i];
+                var oneMap = {};
+                var graphParam = new Set();
+                for (var j = 0; j < node.inputParams.length; j ++) {
+                    oneMap[node.inputParams[j]] = new Set();
+                    if (graphInputParams.includes(node.inputParams[j])) {
+                        graphParam.add(node.inputParams[j]);
+                    }
+                }
+                paramMap[node.name] = oneMap;
+                upstreamContribution[node.name] = {};
+                upstreamContribution[node.name]["graph"] = graphParam;
+            }
+
+            for (var i = 0; i < queue.length; i ++) {
+                var node = queue[i];
+                for (var j = 0; j < node.inputParams.length; j ++) {
+                    paramMap[node.name][node.inputParams[j]].add("graph");
+                }
+            }
+            console.log(paramMap);
+            
+            var level = 0;
+            while (queue.length > 0) {
+                let tempQueue = [];
+                var idx = 0;
+                let x = width / queue.length;
+                while (queue.length > 0) {
+                    let node = queue.shift();
+                    node.level = level;
+                    node.idx = idx;
+                    node.x = idx * x + x / 2;
+                    for (var i = 0; i < edges.length; i ++) {
+                        if (edges[i].source == node.name) {
+                            var targetNode = nodeMap[edges[i].target];
+                            var paramSet = new Set();
+                            for (var j = 0; j < targetNode.inputParams.length; j ++) {
+                                var paramSource = paramMap[targetNode.name][targetNode.inputParams[j]];
+                                if (params[node.name].has(targetNode.inputParams[j])) {
+                                    if (graphInputParams.includes(targetNode.inputParams[j])) {
+                                        paramSource.add("graph");
+                                    } else {
+                                        paramSource.add(node.name);
+                                        paramSet.add(targetNode.inputParams[j]);
+                                    }
+                                }
+                            }
+                            upstreamContribution[targetNode.name][node.name] = paramSet;
+                            if (-- degrees[edges[i].target] == 0 && ! visited.has(edges[i].target)) {
+                                tempQueue.push(nodeMap[edges[i].target]);
+                                visited.add(edges[i].target);
+                            }
+                        }
+                    }
+                    idx ++;
+                    
+                }
+                queue = tempQueue;
+                level ++;
+            }
+            let y = height / level;
+            for (var i = 0; i < nodes.length; i ++) {
+                nodes[i].y = nodes[i].level * y + y / 2;
+                nodes[i].source = paramMap[nodes[i].name];
+                nodes[i].upstreamContribution = upstreamContribution[nodes[i].name];
+            }
+            console.log(nodes);
+        }
+
+        function draw() {
+            var text = document.getElementById('graphInfo').value;
+            if (text == "") {
+                alert("图结构不能为空！");
+                return;
+            }
+            var width = document.getElementById('graph').offsetWidth;
+            var height = document.getElementById('graph').offsetHeight;
+            console.log(width, height);
+
+            try {
+                var data = JSON.parse(text);
+            } catch (e) {
+                alert("图结构不合法，请检查是否是合法json字符串！");
+                throw e;
+            }
+            var nodes = data.nodes;
+            var edges = data.edges;
+            var graphInputParams = data.graphInputParams;
+            var graphOutputParams = data.graphOutputParams;
+            try {
+                setPosition(nodes, edges, graphInputParams, graphOutputParams, width, height);
+            } catch (e) {
+                alert("图结构不合法，请检查是否是DAG！");
+                throw e;
+            }
+
+            var nodeMap = {};
+            for (var i = 0; i < nodes.length; i ++) {
+                nodeMap[nodes[i].name] = nodes[i];
+            }
+
+            var option = {
+                tooltip: {},
+                animationDurationUpdate: 1500,
+                animationEasingUpdate: 'quinticInOut',
+                series: [
+                    {
+                        type: 'graph',
+                        layout: 'none',
+                        symbolSize: 50,
+                        roam: true,
+                        label: {
+                            show: true
+                        },
+                        edgeSymbol: ['circle', 'arrow'],
+                        edgeSymbolSize: [4, 10],
+                        edgeLabel: {
+                            fontSize: 20
+                        },
+                        data: nodes,
+                        links: edges,
+                        lineStyle: {
+                            opacity: 0.9,
+                            width: 2,
+                            curveness: 0
+                        }
+                    }
+                ]
+            };
+
+            var myChart = echarts.init(document.getElementById('graph'))
+            myChart.setOption(option);
+            myChart.on('click', function(params) {
+                if (params.componentType === 'series') {
+                    if (params.seriesType === 'graph') {
+                        if (params.dataType === 'node') {
+                            console.log('点击了节点', params);
+                            // 在这里添加你的逻辑
+                            var node = nodeMap[params.data.name];
+                            var showText = "";
+                            showText += "入参: " + node.inputParams.join(", ") + "\n";
+                            showText += "出参: " + node.outputParams.join(", ") + "\n";
+                            showText += "入参来源: \n";
+                            for (var i = 0; i < node.inputParams.length; i ++) {
+                                showText += "   - " + node.inputParams[i] + ": " + Array.from(node.source[node.inputParams[i]]).join(", ") + "\n";
+                            }
+                            showText += "上游贡献: \n";
+                            if ("graph" in node.upstreamContribution) {
+                                showText += "    - graph: " + Array.from(node.upstreamContribution["graph"]).join(", ") + "\n";
+                            }
+                            for (var i = 0; i < nodes.length; i ++) {
+                                if (nodes[i].name in node.upstreamContribution) {
+                                    showText += "    - " + nodes[i].name + ": " + Array.from(node.upstreamContribution[nodes[i].name]).join(", ") + "\n";
+                                }
+                            }
+                            document.getElementById('nodeInfo').value = showText;
+                            document.getElementById('nodeName').innerText = "结点" + node.name +  "信息";
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
