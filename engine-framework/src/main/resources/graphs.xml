@@ -11,20 +11,27 @@
     <bean id="simpleGraph" class="com.yosoro25252.engine.framework.processors.DAGContainerProcessor" init-method="init">
         <constructor-arg name="inputParamList">
             <list>
-                <value>userId</value>
-                <value>uuid</value>
-                <value>strategy</value>
+                <value>a</value>
+                <value>b</value>
+                <value>c</value>
             </list>
         </constructor-arg>
         <constructor-arg name="outputParamList">
             <list>
-                <value>weightedScore</value>
+                <value>m</value>
+                <value>n</value>
             </list>
         </constructor-arg>
         <constructor-arg name="processorList">
             <list>
-                <ref bean="simpleDAGProcessorV1"/>
-                <ref bean="simpleDAGProcessorV2"/>
+                <ref bean="A"/>
+                <ref bean="B"/>
+                <ref bean="C"/>
+                <ref bean="D"/>
+                <ref bean="E"/>
+                <ref bean="F"/>
+                <ref bean="G"/>
+                <ref bean="H"/>
             </list>
         </constructor-arg>
         <constructor-arg name="controlService" ref="dagControlService"/>

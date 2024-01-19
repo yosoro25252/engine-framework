@@ -7,33 +7,144 @@
     <!--  存放图结点组件bean  -->
     <import resource="services.xml"/>
 
-    <bean id="simpleDAGProcessorV1" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+    <bean id="A" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+        <property name="processorName" value="A"/>
         <property name="inputParamList">
             <list>
-                <value>userId</value>
-                <value>uuid</value>
-                <value>strategy</value>
+                <value>a</value>
+                <value>b</value>
+                <value>c</value>
             </list>
         </property>
         <property name="outputParamList">
             <list>
-                <value>score</value>
+                <value>d</value>
             </list>
         </property>
         <property name="threadPoolTag" value="cpu"/>
         <property name="monitorService" ref="monitorService"/>
     </bean>
 
-    <bean id="simpleDAGProcessorV2" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV2">
+    <bean id="B" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+        <property name="processorName" value="B"/>
         <property name="inputParamList">
             <list>
-                <value>strategy</value>
-                <value>score</value>
+                <value>a</value>
+                <value>d</value>
             </list>
         </property>
         <property name="outputParamList">
             <list>
-                <value>weightedScore</value>
+                <value>e</value>
+            </list>
+        </property>
+        <property name="threadPoolTag" value="cpu"/>
+        <property name="monitorService" ref="monitorService"/>
+    </bean>
+
+    <bean id="C" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+        <property name="processorName" value="C"/>
+        <property name="inputParamList">
+            <list>
+                <value>b</value>
+                <value>c</value>
+                <value>d</value>
+            </list>
+        </property>
+        <property name="outputParamList">
+            <list>
+                <value>f</value>
+                <value>g</value>
+            </list>
+        </property>
+        <property name="threadPoolTag" value="cpu"/>
+        <property name="monitorService" ref="monitorService"/>
+    </bean>
+
+    <bean id="D" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+        <property name="processorName" value="D"/>
+        <property name="inputParamList">
+            <list>
+                <value>a</value>
+                <value>e</value>
+                <value>g</value>
+            </list>
+        </property>
+        <property name="outputParamList">
+            <list>
+                <value>h</value>
+            </list>
+        </property>
+        <property name="threadPoolTag" value="cpu"/>
+        <property name="monitorService" ref="monitorService"/>
+    </bean>
+
+    <bean id="E" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+        <property name="processorName" value="E"/>
+        <property name="inputParamList">
+            <list>
+                <value>e</value>
+            </list>
+        </property>
+        <property name="outputParamList">
+            <list>
+                <value>i</value>
+            </list>
+        </property>
+        <property name="threadPoolTag" value="cpu"/>
+        <property name="monitorService" ref="monitorService"/>
+    </bean>
+
+    <bean id="F" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+        <property name="processorName" value="F"/>
+        <property name="inputParamList">
+            <list>
+                <value>a</value>
+                <value>i</value>
+                <value>f</value>
+                <value>g</value>
+            </list>
+        </property>
+        <property name="outputParamList">
+            <list>
+                <value>j</value>
+                <value>k</value>
+            </list>
+        </property>
+        <property name="threadPoolTag" value="cpu"/>
+        <property name="monitorService" ref="monitorService"/>
+    </bean>
+
+    <bean id="G" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+        <property name="processorName" value="G"/>
+        <property name="inputParamList">
+            <list>
+                <value>i</value>
+                <value>j</value>
+            </list>
+        </property>
+        <property name="outputParamList">
+            <list>
+                <value>l</value>
+                <value>m</value>
+            </list>
+        </property>
+        <property name="threadPoolTag" value="cpu"/>
+        <property name="monitorService" ref="monitorService"/>
+    </bean>
+
+    <bean id="H" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+        <property name="processorName" value="H"/>
+        <property name="inputParamList">
+            <list>
+                <value>f</value>
+                <value>h</value>
+                <value>m</value>
+            </list>
+        </property>
+        <property name="outputParamList">
+            <list>
+                <value>n</value>
             </list>
         </property>
         <property name="threadPoolTag" value="cpu"/>

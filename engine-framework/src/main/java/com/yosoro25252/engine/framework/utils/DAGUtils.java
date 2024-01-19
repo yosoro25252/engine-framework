@@ -161,6 +161,7 @@ public class DAGUtils {
             }
         }
         for (DAGNodeProcessor processor : processorList) {
+            Set<DAGNodeProcessor> alreadyAdded = new HashSet<>();
             for (String param : processor.getInputParamList()) {
                 if (!graphInputParamSet.contains(param)) {
                     List<DAGNodeProcessor> paramProcessorList = outputParamProcessorMap.get(param);
@@ -169,7 +170,10 @@ public class DAGUtils {
                         return new GraphCheckInfo(false, processor, param, null);
                     }
                     for (DAGNodeProcessor paramProcessor : paramProcessorList) {
-                        paramProcessor.getDownstreamNodeList().add(processor);
+                        if (! alreadyAdded.contains(paramProcessor)) {
+                            paramProcessor.getDownstreamNodeList().add(processor);
+                            alreadyAdded.add(paramProcessor);
+                        }
                     }
                 }
             }
