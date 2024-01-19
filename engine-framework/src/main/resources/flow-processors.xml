@@ -4,7 +4,7 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
-        <!-- 存放串行组件bean（不含DAGContainerProcessor） -->
+        <!--  存放串行组件bean（不含DAGContainerProcessor）  -->
         <import resource="services.xml"/>
 
         <bean id="simpleFlowProcessor" class="com.yosoro25252.engine.framework.impl.SimpleFlowProcessor"/>

@@ -8,6 +8,7 @@ import com.yosoro25252.engine.framework.pojo.GraphStructureInfo;
 import com.yosoro25252.engine.framework.processors.DAGNodeProcessor;
 import com.yosoro25252.engine.framework.utils.DAGUtils;
 import com.yosoro25252.engine.framework.utils.GsonUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 import java.util.HashMap;
@@ -19,8 +20,9 @@ import java.util.concurrent.*;
  * @author：yosoro25252
  * @date：2024/1/16
  * @desc: DAG组件调度服务
- * TODO: 添加日志
  */
+
+@Slf4j
 public class DAGControlService {
 
     private Map<String, ThreadPoolExecutor> threadPoolMap;
@@ -40,14 +42,16 @@ public class DAGControlService {
         if (BuildGraphStyleEnum.FROM_PARAM.getName().equals(buildStyle)) {
             GraphCheckInfo paramReachable = DAGUtils.checkParamReachableAndResolveProcessorRelation(processorList, graphInputParamList, graphOutputParamList);
             if (! paramReachable.isLegal()) {
-                throw new RuntimeException("参数" + paramReachable.getErrorParam() + "不可达");
+                log.error("建图失败: 参数 = {} 不可达", paramReachable.getErrorParam());
+                throw new RuntimeException("建图失败: 参数" + paramReachable.getErrorParam() + "不可达");
             }
         }
 
         // 判环
         GraphCheckInfo containCycleResult = DAGUtils.checkGraphCycle(processorList);
         if (! containCycleResult.isLegal()) {
-            throw new RuntimeException("结点" + containCycleResult.getErrorNode().getProcessorName() + "处有环");
+            log.error("建图失败: 结点 = {} 处有环", containCycleResult.getErrorNode().getProcessorName());
+            throw new RuntimeException("建图失败: 结点" + containCycleResult.getErrorNode().getProcessorName() + "处有环");
         }
 
         // 配置结点依赖信息
@@ -61,7 +65,7 @@ public class DAGControlService {
 
         // 图可视化
         GraphStructureInfo graphStructureInfo = DAGUtils.getGraphStructureInfo(processorList, graphInputParamList, graphOutputParamList);
-        System.out.println(graphName + "图结构信息: " + GsonUtils.getJsonStringFromObject(graphStructureInfo));
+        log.info("建图成功: graphName = {}, graphStructureInfo = {}", graphName, GsonUtils.getJsonStringFromObject(graphStructureInfo));
 
         // 建图
         return new Graph(graphName, timeout, processorList.size(), processorList, orderedProcessorList);

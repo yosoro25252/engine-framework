@@ -7,6 +7,7 @@ import com.yosoro25252.engine.framework.pojo.Context;
 import com.yosoro25252.engine.framework.processors.BaseProcessor;
 import com.yosoro25252.engine.framework.processors.IProcessor;
 import com.yosoro25252.engine.framework.services.IMonitorService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -16,8 +17,9 @@ import static com.yosoro25252.engine.framework.constants.MonitorConstants.*;
  * @author：yosoro25252
  * @date：2024/1/16
  * @desc: 串行组件调度服务
- * TODO: 添加日志
  */
+
+@Slf4j
 public class FlowControlService {
 
     private IMonitorService monitorService;
@@ -41,6 +43,7 @@ public class FlowControlService {
         } catch (RuntimeException e) {
             monitorService.logEvent(SERVICE_WRONG_PARAM, serviceName, false);
             monitorService.logException(SERVICE_WRONG_PARAM, e);
+            log.warn("请求失败 - 参数错误: request = {}, serviceName = {}, e = ", request, serviceName, e);
             return resultBuilder.buildResultWhenParamError(request, e);
         }
         try {
@@ -61,6 +64,7 @@ public class FlowControlService {
             monitorService.logCost(SERVICE_TIME_COST, serviceNameWithBizException, timeCost);
             monitorService.logCost(SERVICE_TIME_COST, serviceName, timeCost);
             monitorService.logException(SERVICE_PROCESS, e);
+            log.warn("请求失败 - 业务错误: context = {}, serviceName = {}, e = ", context, serviceName, e);
             return response;
         } catch (RuntimeException e) {
             T response = resultBuilder.buildResultWhenRuntimeException(context);
@@ -70,6 +74,7 @@ public class FlowControlService {
             monitorService.logCost(SERVICE_TIME_COST, serviceNameWithRuntimeException, timeCost);
             monitorService.logCost(SERVICE_TIME_COST, serviceName, timeCost);
             monitorService.logException(SERVICE_PROCESS, e);
+            log.warn("请求失败 - 执行错误: context = {}, serviceName = {}, e = ", context, serviceName, e);
             return response;
         }
     }

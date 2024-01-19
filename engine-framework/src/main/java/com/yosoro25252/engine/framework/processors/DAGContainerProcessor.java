@@ -69,7 +69,7 @@ public class DAGContainerProcessor extends BaseProcessor {
 
     /**
      * 拓展接口 - 异常兜底方法
-     * 默认抛出异常，可根据情况需要重写
+     * 默认抛出异常，中断流程；根据情况需要重写
      * @param context 流程上下文
      * @param e 异常
      */
