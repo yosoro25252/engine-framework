@@ -39,7 +39,8 @@ public class DAGControlService {
                             String buildStyle,
                             int timeout) {
         // 根据出入参构建结点依赖信息
-        if (BuildGraphStyleEnum.FROM_PARAM.getName().equals(buildStyle)) {
+        boolean buildGraphFromParam = BuildGraphStyleEnum.FROM_PARAM.getName().equals(buildStyle);
+        if (buildGraphFromParam) {
             GraphCheckInfo paramReachable = DAGUtils.checkParamReachableAndResolveProcessorRelation(processorList, graphInputParamList, graphOutputParamList);
             if (! paramReachable.isLegal()) {
                 log.error("建图失败: 参数 = {} 不可达", paramReachable.getErrorParam());
@@ -60,12 +61,14 @@ public class DAGControlService {
         // 序列构建
         List<DAGNodeProcessor> orderedProcessorList = DAGUtils.buildOrderedProcessorSequence(processorList);
 
-        // 优化结点关系 - 让图结构更清晰
-        DAGUtils.optimizeGraph(orderedProcessorList, graphInputParamList);
+        if (buildGraphFromParam) {
+            // 优化结点关系 - 让图结构更清晰
+            DAGUtils.optimizeGraph(orderedProcessorList, graphInputParamList);
 
-        // 图可视化
-        GraphStructureInfo graphStructureInfo = DAGUtils.getGraphStructureInfo(processorList, graphInputParamList, graphOutputParamList);
-        log.info("建图成功: graphName = {}, graphStructureInfo = {}", graphName, GsonUtils.getJsonStringFromObject(graphStructureInfo));
+            // 图可视化
+            GraphStructureInfo graphStructureInfo = DAGUtils.getGraphStructureInfo(processorList, graphInputParamList, graphOutputParamList);
+            log.info("建图成功: graphName = {}, graphStructureInfo = {}", graphName, GsonUtils.getJsonStringFromObject(graphStructureInfo));
+        }
 
         // 建图
         return new Graph(graphName, timeout, processorList.size(), processorList, orderedProcessorList);

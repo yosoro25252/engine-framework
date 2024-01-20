@@ -1,7 +1,7 @@
 package com.yosoro25252.engine.framework.flowcontrol;
 
 import com.yosoro25252.engine.framework.builder.ContextBuilder;
-import com.yosoro25252.engine.framework.builder.ResultBuilder;
+import com.yosoro25252.engine.framework.builder.ResponseBuilder;
 import com.yosoro25252.engine.framework.processors.BaseProcessor;
 import com.yosoro25252.engine.framework.services.IMonitorService;
 
@@ -26,7 +26,7 @@ public class FlowContainer<S, T> {
 
     private ContextBuilder<S> contextBuilder;
 
-    private ResultBuilder<S, T> resultBuilder;
+    private ResponseBuilder<S, T> responseBuilder;
 
     private IMonitorService monitorService;
 
@@ -35,13 +35,13 @@ public class FlowContainer<S, T> {
     public FlowContainer(List<BaseProcessor> processorList,
                          String serviceName,
                          ContextBuilder<S> contextBuilder,
-                         ResultBuilder<S, T> resultBuilder,
+                         ResponseBuilder<S, T> responseBuilder,
                          IMonitorService monitorService,
                          FlowControlService flowControlService) {
         this.processorList = processorList;
         this.serviceName = serviceName;
         this.contextBuilder = contextBuilder;
-        this.resultBuilder = resultBuilder;
+        this.responseBuilder = responseBuilder;
         this.monitorService = monitorService;
         this.serviceNameWithSuccess = serviceName + "-Success";
         this.serviceNameWithBizException = serviceName + "-BizException";
@@ -50,7 +50,7 @@ public class FlowContainer<S, T> {
     }
 
     public T process(S request) {
-        return flowControlService.process(request, processorList, serviceName, serviceNameWithSuccess, serviceNameWithBizException, serviceNameWithRuntimeException, contextBuilder, resultBuilder);
+        return flowControlService.process(request, processorList, serviceName, serviceNameWithSuccess, serviceNameWithBizException, serviceNameWithRuntimeException, contextBuilder, responseBuilder);
     }
 
 }

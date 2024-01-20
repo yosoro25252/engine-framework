@@ -1,7 +1,7 @@
 package com.yosoro25252.engine.framework.flowcontrol;
 
 import com.yosoro25252.engine.framework.builder.ContextBuilder;
-import com.yosoro25252.engine.framework.builder.ResultBuilder;
+import com.yosoro25252.engine.framework.builder.ResponseBuilder;
 import com.yosoro25252.engine.framework.exception.BizException;
 import com.yosoro25252.engine.framework.pojo.Context;
 import com.yosoro25252.engine.framework.processors.BaseProcessor;
@@ -35,7 +35,7 @@ public class FlowControlService {
                             String serviceNameWithBizException,
                             String serviceNameWithRuntimeException,
                             ContextBuilder<S> contextBuilder,
-                            ResultBuilder<S, T> resultBuilder) {
+                            ResponseBuilder<S, T> responseBuilder) {
         long t1 = System.currentTimeMillis();
         Context<S> context = null;
         try {
@@ -44,21 +44,27 @@ public class FlowControlService {
             monitorService.logEvent(SERVICE_WRONG_PARAM, serviceName, false);
             monitorService.logException(SERVICE_WRONG_PARAM, e);
             log.warn("请求失败 - 参数错误: request = {}, serviceName = {}, e = ", request, serviceName, e);
-            return resultBuilder.buildResultWhenParamError(request, e);
+            return responseBuilder.buildResultWhenParamError(request, e);
         }
+        IProcessor currProcessor = null;
         try {
             for (IProcessor processor : processorList) {
-                processor.process(context);
+                currProcessor = processor;
+                currProcessor.process(context);
             }
-            T response = resultBuilder.buildResult(context);
+            T response = responseBuilder.buildResult(context);
             long timeCost = System.currentTimeMillis() - t1;
             monitorService.logEvent(SERVICE_PROCESS, serviceName, true);
             monitorService.logCost(SERVICE_TIME_COST, serviceNameWithSuccess, timeCost);
             monitorService.logCost(SERVICE_TIME_COST, serviceName, timeCost);
             return response;
         } catch (BizException e) {
-            T response = resultBuilder.buildResultWhenBizException(context);
+            T response = responseBuilder.buildResultWhenBizException(context);
             long timeCost = System.currentTimeMillis() - t1;
+            if (currProcessor != null) {
+                monitorService.logEvent(PROCESSOR_PROCESS_BIZ_EXCEPTION, currProcessor.getProcessorName(), false);
+                monitorService.logEvent(PROCESSOR_PROCESS, currProcessor.getProcessorName(), false);
+            }
             monitorService.logEvent(SERVICE_PROCESS, serviceName, false);
             monitorService.logEvent(SERVICE_PROCESS, serviceNameWithBizException, false);
             monitorService.logCost(SERVICE_TIME_COST, serviceNameWithBizException, timeCost);
@@ -67,8 +73,12 @@ public class FlowControlService {
             log.warn("请求失败 - 业务错误: context = {}, serviceName = {}, e = ", context, serviceName, e);
             return response;
         } catch (RuntimeException e) {
-            T response = resultBuilder.buildResultWhenRuntimeException(context);
+            T response = responseBuilder.buildResultWhenRuntimeException(context);
             long timeCost = System.currentTimeMillis() - t1;
+            if (currProcessor != null) {
+                monitorService.logEvent(PROCESSOR_PROCESS_RUNTIME_EXCEPTION, currProcessor.getProcessorName(), false);
+                monitorService.logEvent(PROCESSOR_PROCESS, currProcessor.getProcessorName(), false);
+            }
             monitorService.logEvent(SERVICE_PROCESS, serviceName, false);
             monitorService.logEvent(SERVICE_PROCESS, serviceNameWithRuntimeException, false);
             monitorService.logCost(SERVICE_TIME_COST, serviceNameWithRuntimeException, timeCost);

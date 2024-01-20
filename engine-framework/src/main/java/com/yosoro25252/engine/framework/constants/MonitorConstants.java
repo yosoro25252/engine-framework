@@ -27,4 +27,14 @@ public class MonitorConstants {
      */
     public static String PROCESSOR_PROCESS = "ProcessorProcess";
 
+    /**
+     * 事件埋点 - 结点执行特殊异常次数
+     */
+    public static String PROCESSOR_PROCESS_BIZ_EXCEPTION = "ProcessorProcessBizException";
+
+    /**
+     * 事件埋点 - 结点执行异常次数
+     */
+    public static String PROCESSOR_PROCESS_RUNTIME_EXCEPTION = "ProcessorProcessRuntimeException";
+
 }

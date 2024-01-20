@@ -7,7 +7,7 @@ import com.yosoro25252.engine.framework.pojo.Context;
  * @date：2024/1/16
  * @desc: 服务返回结果构造器
  */
-public interface ResultBuilder<S, T> {
+public interface ResponseBuilder<S, T> {
 
     /**
      * 服务正常执行完成时，构造返回结果
