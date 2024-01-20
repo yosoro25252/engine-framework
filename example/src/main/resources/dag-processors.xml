@@ -7,7 +7,7 @@
     <!--  存放图结点组件bean  -->
     <import resource="services.xml"/>
 
-    <bean id="A" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+    <bean id="A" class="com.example.impl.SimpleDAGNodeProcessorV1">
         <property name="processorName" value="A"/>
         <property name="inputParamList">
             <list>
@@ -25,7 +25,7 @@
         <property name="monitorService" ref="monitorService"/>
     </bean>
 
-    <bean id="B" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+    <bean id="B" class="com.example.impl.SimpleDAGNodeProcessorV1">
         <property name="processorName" value="B"/>
         <property name="inputParamList">
             <list>
@@ -42,7 +42,7 @@
         <property name="monitorService" ref="monitorService"/>
     </bean>
 
-    <bean id="C" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+    <bean id="C" class="com.example.impl.SimpleDAGNodeProcessorV1">
         <property name="processorName" value="C"/>
         <property name="inputParamList">
             <list>
@@ -61,7 +61,7 @@
         <property name="monitorService" ref="monitorService"/>
     </bean>
 
-    <bean id="D" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+    <bean id="D" class="com.example.impl.SimpleDAGNodeProcessorV1">
         <property name="processorName" value="D"/>
         <property name="inputParamList">
             <list>
@@ -79,7 +79,7 @@
         <property name="monitorService" ref="monitorService"/>
     </bean>
 
-    <bean id="E" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+    <bean id="E" class="com.example.impl.SimpleDAGNodeProcessorV1">
         <property name="processorName" value="E"/>
         <property name="inputParamList">
             <list>
@@ -95,7 +95,7 @@
         <property name="monitorService" ref="monitorService"/>
     </bean>
 
-    <bean id="F" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+    <bean id="F" class="com.example.impl.SimpleDAGNodeProcessorV1">
         <property name="processorName" value="F"/>
         <property name="inputParamList">
             <list>
@@ -115,7 +115,7 @@
         <property name="monitorService" ref="monitorService"/>
     </bean>
 
-    <bean id="G" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+    <bean id="G" class="com.example.impl.SimpleDAGNodeProcessorV1">
         <property name="processorName" value="G"/>
         <property name="inputParamList">
             <list>
@@ -133,7 +133,7 @@
         <property name="monitorService" ref="monitorService"/>
     </bean>
 
-    <bean id="H" class="com.yosoro25252.engine.framework.impl.SimpleDAGNodeProcessorV1">
+    <bean id="H" class="com.example.impl.SimpleDAGNodeProcessorV1">
         <property name="processorName" value="H"/>
         <property name="inputParamList">
             <list>

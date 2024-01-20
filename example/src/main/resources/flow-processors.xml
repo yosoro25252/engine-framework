@@ -7,6 +7,6 @@
         <!--  存放串行组件bean（不含DAGContainerProcessor）  -->
         <import resource="services.xml"/>
 
-        <bean id="simpleFlowProcessor" class="com.yosoro25252.engine.framework.impl.SimpleFlowProcessor"/>
+        <bean id="simpleFlowProcessor" class="com.example.impl.SimpleFlowProcessor"/>
 
 </beans>

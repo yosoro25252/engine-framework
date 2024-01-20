@@ -11,6 +11,7 @@
 
     <groupId>yosoro25252</groupId>
     <artifactId>engine-framework</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

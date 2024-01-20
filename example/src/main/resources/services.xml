@@ -42,6 +42,6 @@
         </constructor-arg>
     </bean>
     
-    <bean id="monitorService" class="com.yosoro25252.engine.framework.impl.SimpleMonitorService"/>
+    <bean id="monitorService" class="com.example.impl.SimpleMonitorService"/>
 
 </beans>
