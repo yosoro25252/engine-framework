@@ -14,12 +14,23 @@ DAG编排是对执行逻辑的抽象。
 
 ### 二、框架介绍
 
+我们设计了一个简单的支持DAG编排的流程框架，它使用CompletableFuture完成DAG组件的异步编排。
+同时，我们也提供了DAG执行引擎，完成流程配置和调度执行的工作。
+并且，我们进一步扩展了框架，使框架涵盖了从接受参数到结果返回的全流程。
 
-
-这个项目不是低代码项目，它不能帮助降低开发门槛。它的目的是：
+我们的项目的目的是：
 - 开发提效：对组件（子流程）进行高效复用，且框架抽取了部分公用逻辑，降低开发成本
 - 功能解耦：对每个子流程单独封装成组件，每个流程按需引入所需组件，降低耦合度
 - 性能优化：按照依赖关系、自动完成组件的调度执行，避免无意义的串行增加耗时
+
+我们把组件分为串行组件和DAG组件。
+考虑到在一些业务中，DAG只是其中一个阶段、完成一部分任务，串行流程用得相对更多。
+我们将跑DAG的部分设计成了一个特殊的串行组件DAGContainerProcessor，DAG组件需要在其中调度运行。
+因此，框架的主体是串行执行的，但是其中配置的DAG流程中的DAG组件，会以DAG方式运行。
+这种方式兼顾了只用DAG流程和串行、DAG混用的情形。
+如果只用DAG，则配置一个DAGContainerProcessor的串行组件、并把DAG组件挂在其中即可；
+如果只用串行，则配置串行组件、不用DAGContainerProcessor和DAG组件即可；
+如果串行和DAG混用，则把需要DAG执行的部分用DAGContainerProcessor包起来、其他用串行组件即可。
 
 ### 三、框架使用
 
@@ -53,6 +64,19 @@ FlowProcessor继承自BaseProcessor，它会自动添加组件执行和耗时埋
 
 
 #### 3、DAG结点配置
+
+配置所有的DAG组件。每个DAG组件应该是DAGNodeProcessor的实例。DAGNodeProcessor继承自BaseProcessor，因此也包含了组件执行和耗时的埋点。
+和串行组件相同，新建一个DAG组件时，需要实现getProcessorName和doProcess方法。
+
+DAG组件需要配置如下内容：
+- inputParamList：结点入参（按出入参建图时必填）
+- outputParamList：结点出参（按出入参建图时必填）
+- downstreamNodeList：下游结点（按结点关系建图时必填）
+- threadPoolTag：线程池标签（第五小节介绍）
+- monitorService：埋点上报服务（第五小节介绍）
+
+需要注意，因为目前DAG建图可以选择两种方式，因此结点inputParamList、outputParamList和downstreamNodeList可根据需要自由配置。
+但是，如果建图方式是按参数，就只会用结点配置中的inputParamList和outputParamList；同理，如果建图方式是按结点关系，就只会用结点配置的downstreamNodeList信息。
 
 详细配置可参照example模块/resource/dag-processors.xml示例。
 
