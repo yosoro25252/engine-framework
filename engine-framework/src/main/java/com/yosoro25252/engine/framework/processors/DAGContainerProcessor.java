@@ -13,7 +13,7 @@ import java.util.List;
  * @date：2024/1/16
  * @desc: DAG容器组件。通过这个组件完成建图和图执行。图的具体执行逻辑由其中的DAGNodeProcessor控制
  */
-public class DAGContainerProcessor extends BaseProcessor {
+public class DAGContainerProcessor extends FlowProcessor {
 
     private List<String> inputParamList = new ArrayList<>();
 

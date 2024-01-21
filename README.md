@@ -2,8 +2,6 @@
 
 ### 一、DAG编排介绍
 
-DAG编排是对执行逻辑的抽象。
-
 我们可以把一个执行逻辑（e.g. 接口请求处理）看作是一个流程，而执行逻辑中的每一步（e.g. 查A表、查B表、写C表），是一个子流程。我们可以发现，在一个大流程中，不是每个子流程都是相互依赖的、需要遵照特定的顺序执行。它们中，有的可能有依赖，有的可能无依赖。
 我们可以按照依赖关系，把子流程画作结点，子流程依赖关系画作结点间的有向边（B依赖A => A -> B），这样我们就能得到一张有向无环图（DAG）。
 这样，每个流程，就被我们变作子流程构成的DAG。只要我们按照依赖关系来执行所有子流程，大流程就被执行完成了。
@@ -14,29 +12,30 @@ DAG编排是对执行逻辑的抽象。
 
 ### 二、框架介绍
 
-我们设计了一个简单的支持DAG编排的流程框架，它使用CompletableFuture完成DAG组件的异步编排。
-同时，我们也提供了DAG执行引擎，完成流程配置和调度执行的工作。
-并且，我们进一步扩展了框架，使框架涵盖了从接受参数到结果返回的全流程。
+我们设计了一个简单的支持DAG编排的流程框架，并提供了一个DAG执行引擎，完成流程配置和调度执行的工作。
+并且，我们进一步扩展了框架，使框架包含了从接受参数到结果返回的全流程。
 
-我们的项目的目的是：
-- 开发提效：对组件（子流程）进行高效复用，且框架抽取了部分公用逻辑，降低开发成本
-- 功能解耦：对每个子流程单独封装成组件，每个流程按需引入所需组件，降低耦合度
-- 性能优化：按照依赖关系、自动完成组件的调度执行，避免无意义的串行增加耗时
-
-我们把组件分为串行组件和DAG组件。
+我们把组件分为串行组件（FlowProcessor）和DAG组件（DAGNodeProcessor）。
 考虑到在一些业务中，DAG只是其中一个阶段、完成一部分任务，串行流程用得相对更多。
-我们将跑DAG的部分设计成了一个特殊的串行组件DAGContainerProcessor，DAG组件需要在其中调度运行。
+我们设计了一个特殊的串行组件DAGContainerProcessor，它可以看作DAG组件的容器，DAG组件需要在其中调度运行。
 因此，框架的主体是串行执行的，但是其中配置的DAG流程中的DAG组件，会以DAG方式运行。
-这种方式兼顾了只用DAG流程和串行、DAG混用的情形。
-如果只用DAG，则配置一个DAGContainerProcessor的串行组件、并把DAG组件挂在其中即可；
+这种方式兼顾了只用DAG流程、只用串行流程和串行、DAG混用的情形。
+如果只用DAG，则配置一个DAGContainerProcessor的串行组件、并把需要的DAG组件挂在其中即可；
 如果只用串行，则配置串行组件、不用DAGContainerProcessor和DAG组件即可；
 如果串行和DAG混用，则把需要DAG执行的部分用DAGContainerProcessor包起来、其他用串行组件即可。
+
+我们使用Context（上下文）来保存流程执行的所有结果。
+每个组件以Context为入参，读取所依赖的参数，并执行逻辑得到新的参数，存放在context中，供后续其他组件使用。
+Context会在流程最初由ContextBuilder、根据请求参数进行创建；在最后由ResponseBuilder根据执行状况和Context内容构造返回结果。
+
+整体框架执行流程如下图所示：
+![](C:\Users\Administrator\IdeaProjects\engine\src\main\resources\flow.jpg "执行流")
 
 ### 三、框架使用
 
 #### 1、串行组件配置
 
-配置除DAG流程组件（DAGContainerProcessor）外的所有串行组件。每个串行组件应该时一个FlowProcessor的子类。
+配置除DAG容器组件（DAGContainerProcessor）外的所有串行组件。每个串行组件应该时一个FlowProcessor的子类。
 FlowProcessor继承自BaseProcessor，它会自动添加组件执行和耗时埋点，因此不需要在业务逻辑中重复埋点。
 配置串行组件时需要配置其monitorService属性，用于埋点上报，我们在第五小节进行介绍。
 
@@ -82,7 +81,7 @@ DAG组件需要配置如下内容：
 
 #### 4、DAG流程配置
 
-配置所有的DAG流程。每个图流程应该是DAGContainerProcessor的实例（注意它实际也是一个串行组件）。DAGContainerProcessor包含一个DAG的全部信息，由DAGControlService完成DAG流程调度。
+配置所有的DAG容器组件。每个DAG容器应该是DAGContainerProcessor的实例（注意它实际也是一个串行组件）。DAGContainerProcessor包含一个DAG的全部信息，由DAGControlService完成DAG流程调度。
 
 当配置一个DAG流程时，我们要配置这些内容：
 
