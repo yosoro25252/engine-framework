@@ -23,18 +23,28 @@ public class MonitorConstants {
     public static String SERVICE_PROCESS = "ServiceProcess";
 
     /**
-     * 事件埋点 - 结点执行成功率
+     * 事件埋点 - 串行结点执行成功率
      */
-    public static String PROCESSOR_PROCESS = "ProcessorProcess";
+    public static String FLOW_PROCESSOR_PROCESS = "FlowProcessorProcess";
 
     /**
-     * 事件埋点 - 结点执行特殊异常次数
+     * 事件埋点 - 串行结点执行特殊异常次数
      */
-    public static String PROCESSOR_PROCESS_BIZ_EXCEPTION = "ProcessorProcessBizException";
+    public static String FLOW_PROCESSOR_PROCESS_BIZ_EXCEPTION = "FlowProcessorProcessBizException";
 
     /**
-     * 事件埋点 - 结点执行异常次数
+     * 事件埋点 - 串行结点执行异常次数
      */
-    public static String PROCESSOR_PROCESS_RUNTIME_EXCEPTION = "ProcessorProcessRuntimeException";
+    public static String FLOW_PROCESSOR_PROCESS_RUNTIME_EXCEPTION = "FlowProcessorProcessRuntimeException";
+
+    /**
+     * 事件埋点 - DAG结点执行成功率
+     */
+    public static String DAG_PROCESSOR_PROCESS = "DAGProcessorProcess";
+
+    /**
+     * 事件埋点 - DAG结点执行特殊异常次数
+     */
+    public static String DAG_PROCESSOR_PROCESS_ERROR = "DAGProcessorProcessError";
 
 }

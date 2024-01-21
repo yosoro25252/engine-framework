@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author：yosoro25252
  * @date：2024/1/19 4:09
- * @desc:
+ * @desc: 串行流程容器
  */
 public class FlowContainer<S, T> {
 

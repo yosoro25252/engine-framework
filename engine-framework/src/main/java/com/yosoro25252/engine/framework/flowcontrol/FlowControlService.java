@@ -22,6 +22,8 @@ import static com.yosoro25252.engine.framework.constants.MonitorConstants.*;
 @Slf4j
 public class FlowControlService {
 
+    private static final String RESPONSE_BUILDER = "ResponseBuilder";
+
     private IMonitorService monitorService;
 
     public FlowControlService(IMonitorService monitorService) {
@@ -61,30 +63,28 @@ public class FlowControlService {
         } catch (BizException e) {
             T response = responseBuilder.buildResultWhenBizException(context);
             long timeCost = System.currentTimeMillis() - t1;
-            if (currProcessor != null) {
-                monitorService.logEvent(PROCESSOR_PROCESS_BIZ_EXCEPTION, currProcessor.getProcessorName(), false);
-                monitorService.logEvent(PROCESSOR_PROCESS, currProcessor.getProcessorName(), false);
-            }
+            String errorProcessorName = currProcessor != null ? currProcessor.getProcessorName() : RESPONSE_BUILDER;
+            monitorService.logEvent(FLOW_PROCESSOR_PROCESS_BIZ_EXCEPTION, errorProcessorName, false);
+            monitorService.logEvent(FLOW_PROCESSOR_PROCESS, errorProcessorName, false);
             monitorService.logEvent(SERVICE_PROCESS, serviceName, false);
             monitorService.logEvent(SERVICE_PROCESS, serviceNameWithBizException, false);
             monitorService.logCost(SERVICE_TIME_COST, serviceNameWithBizException, timeCost);
             monitorService.logCost(SERVICE_TIME_COST, serviceName, timeCost);
             monitorService.logException(SERVICE_PROCESS, e);
-            log.warn("请求失败 - 业务错误: context = {}, serviceName = {}, e = ", context, serviceName, e);
+            log.error("请求失败 - 业务错误: context = {}, serviceName = {}, processorName = {}, e = ", context, serviceName, errorProcessorName, e);
             return response;
         } catch (RuntimeException e) {
             T response = responseBuilder.buildResultWhenRuntimeException(context);
             long timeCost = System.currentTimeMillis() - t1;
-            if (currProcessor != null) {
-                monitorService.logEvent(PROCESSOR_PROCESS_RUNTIME_EXCEPTION, currProcessor.getProcessorName(), false);
-                monitorService.logEvent(PROCESSOR_PROCESS, currProcessor.getProcessorName(), false);
-            }
+            String errorProcessorName = currProcessor != null ? currProcessor.getProcessorName() : RESPONSE_BUILDER;
+            monitorService.logEvent(FLOW_PROCESSOR_PROCESS_RUNTIME_EXCEPTION, errorProcessorName, false);
+            monitorService.logEvent(FLOW_PROCESSOR_PROCESS, errorProcessorName, false);
             monitorService.logEvent(SERVICE_PROCESS, serviceName, false);
             monitorService.logEvent(SERVICE_PROCESS, serviceNameWithRuntimeException, false);
             monitorService.logCost(SERVICE_TIME_COST, serviceNameWithRuntimeException, timeCost);
             monitorService.logCost(SERVICE_TIME_COST, serviceName, timeCost);
             monitorService.logException(SERVICE_PROCESS, e);
-            log.warn("请求失败 - 执行错误: context = {}, serviceName = {}, e = ", context, serviceName, e);
+            log.error("请求失败 - 执行错误: context = {}, serviceName = {}, processorName = {}, e = ", context, serviceName, errorProcessorName, e);
             return response;
         }
     }
