@@ -52,7 +52,7 @@ FlowProcessor继承自BaseProcessor，它会自动添加组件执行和耗时埋
 
 当配置一个串行流程时，我们需要配置如下内容：
 
-- processorList
+- processorList：流程包含的所有串行组件
 - serviceName：给流程起个名
 - contextBuilder：流程上下文构造器，是一个ContextBuilder接口的实现。完成由请求入参到流程上下文的转换。可以在实现接口时，加入参数校验逻辑，参数问题后抛出异常，FlowControlService会捕获ContextBuilder的异常并作相应处理
 - responseBuilder：返回结果构造器，是一个ResponseBuilder接口的实现。完成由流程上下文到请求结果的转换。接口定义了四个方法，分别对于不同情况下的返回结果构造（运行成功、参数错误、需要业务特殊处理的错误、其他错误）
