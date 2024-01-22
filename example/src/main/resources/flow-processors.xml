@@ -7,6 +7,14 @@
         <!--  存放串行组件bean（不含DAGContainerProcessor）  -->
         <import resource="services.xml"/>
 
-        <bean id="simpleFlowProcessor" class="com.example.impl.SimpleFlowProcessor"/>
+        <bean id="simpleFlowProcessor1" class="com.example.impl.SimpleFlowProcessor">
+                <property name="name" value="flow_processor_1"/>
+                <property name="monitorService" ref="monitorService"/>
+        </bean>
+
+        <bean id="simpleFlowProcessor2" class="com.example.impl.SimpleFlowProcessor">
+                <property name="name" value="flow_processor_2"/>
+                <property name="monitorService" ref="monitorService"/>
+        </bean>
 
 </beans>

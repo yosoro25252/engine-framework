@@ -41,6 +41,10 @@
             </map>
         </constructor-arg>
     </bean>
+
+    <bean id="flowControlService" class="com.yosoro25252.engine.framework.flowcontrol.FlowControlService">
+        <constructor-arg name="monitorService" ref="monitorService"/>
+    </bean>
     
     <bean id="monitorService" class="com.example.impl.SimpleMonitorService"/>
 

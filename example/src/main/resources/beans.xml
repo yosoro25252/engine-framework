@@ -7,6 +7,7 @@
     <import resource="flow-processors.xml"/>
     <import resource="dag-processors.xml"/>
     <import resource="graphs.xml"/>
+    <import resource="flows.xml"/>
     <import resource="services.xml"/>
 
 </beans>

@@ -9,4 +9,23 @@
     <import resource="graphs.xml"/>
     <import resource="services.xml"/>
 
+    <bean name="flowContainer" class="com.yosoro25252.engine.framework.flowcontrol.FlowContainer">
+        <constructor-arg name="processorList">
+            <list>
+                <ref bean="simpleFlowProcessor1"/>
+                <ref bean="simpleGraph"/>
+                <ref bean="simpleFlowProcessor2"/>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="serviceName" value="simpleFlow"/>
+        <constructor-arg name="contextBuilder" ref="contextBuilder"/>
+        <constructor-arg name="responseBuilder" ref="responseBuilder"/>
+        <constructor-arg name="monitorService" ref="monitorService"/>
+        <constructor-arg name="flowControlService" ref="flowControlService"/>
+    </bean>
+
+    <bean name="contextBuilder" class="com.example.impl.SimpleContextBuilder"/>
+
+    <bean name="responseBuilder" class="com.example.impl.SimpleResponseBuilder"/>
+
 </beans>

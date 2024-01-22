@@ -2,8 +2,8 @@ package com.yosoro25252.engine.framework.pojo;
 
 import lombok.Data;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author：yosoro25252
@@ -15,7 +15,7 @@ public class Context<T> {
 
     private T request;
 
-    private Map<String, Object> bizData = new HashMap<>();
+    private Map<String, Object> bizData = new ConcurrentHashMap<>();
 
     public void putToBizData(String key, Object value) {
         bizData.put(key, value);
