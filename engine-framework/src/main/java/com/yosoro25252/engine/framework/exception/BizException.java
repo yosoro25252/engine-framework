@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * @author：yosoro25252
  * @date：2024/1/19 3:44
- * @desc:
+ * @desc: 业务异常
  */
 @Data
 @AllArgsConstructor
